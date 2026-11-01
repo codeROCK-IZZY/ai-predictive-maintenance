@@ -1,6 +1,6 @@
-# AI Predictive Maintenance Platform — Design Document (v0.1, for owner review)
+# AI Predictive Maintenance Platform — Design Document (v1.0)
 
-Status: **DRAFT — awaiting owner approval. No application code has been written yet.**
+Status: **Approved by the owner on 2026-11-01 and implemented.** Section 9 lists where the implementation deviates from this design, and why.
 
 Contents
 1. Product requirements
@@ -359,3 +359,19 @@ Each milestone ends with: passing tests (output shown), docs updated, a walkthro
 5. **Synthetic fleet** of pumps / compressors / motors (§5.1), optionally plus NASA C-MAPSS as an external check.
 6. **MLflow deferred to Project 8**; lightweight in-app model registry here (§5.9).
 7. **Frontend stack:** Vite + React + TypeScript + TanStack Query + Recharts + Tailwind (vs. Next.js — not needed for an authenticated internal dashboard).
+
+---
+
+## 9. Changes made during implementation
+
+| Area | Original design | What was built | Why |
+|---|---|---|---|
+| Production model | XGBoost | Algorithm chosen automatically by cross-validated PR-AUC; **logistic regression won** (0.800 vs 0.782 for XGBoost, within noise). Both are supported | Follow the evidence, not the plan |
+| Temperature features | Raw sensor values | Temperature **rise above ambient**; ambient is not a model input | The first evaluation showed XGBoost ranking ambient temperature as a top feature. That's a spurious seasonal signal, and it hurt the time-holdout score (0.728 → 0.809 after the fix) |
+| Explanations | Top individual SHAP features | **Grouped SHAP**: contributions summed per sensor | Correlated features got large offsetting contributions ("high temperature lowers risk"), which reads as nonsense to an engineer |
+| SHAP implementation | `shap` library | XGBoost `pred_contribs` (TreeSHAP) and the exact linear formula for LR; the `shap` library is used in tests to verify | Faster, no heavy runtime dependency, identical values (tested) |
+| History backfill | — | `backfill` command replays the active model over the past 30 days | Gives the demo a real risk trend and alert history, produced by the model rather than invented |
+| Upload hand-off | Local file | Local volume in Compose; **S3** on AWS | On ECS the API and worker are separate tasks with separate disks |
+| XGBoost package | `xgboost` | `xgboost-cpu` | Same API; the image shrank from 1.65 GB to 863 MB |
+| Repository layer | `repository.py` per module | Services query SQLAlchemy directly; trivial modules have only a router | Extra layer added no value at this size |
+| Advanced features | M11 roadmap | RUL, anomaly score, comparison, CSV reports, cost outlook and what-if simulator all built | Owner asked for everything |

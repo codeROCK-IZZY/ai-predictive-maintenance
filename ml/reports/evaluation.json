@@ -1,0 +1,310 @@
+{
+  "dataset": {
+    "rows": 56802,
+    "positives": 2818,
+    "positive_rate": 0.0496,
+    "units": 40,
+    "from": "2025-10-01T06:00:00+00:00",
+    "to": "2026-09-23T18:00:00+00:00",
+    "horizon_days": 7
+  },
+  "protocol": {
+    "cv": "GroupKFold(5) by equipment unit",
+    "holdout": "time-ordered: train before cutoff minus horizon, test after cutoff",
+    "seed": 42
+  },
+  "cross_validation": {
+    "rule_baseline": {
+      "pr_auc": {
+        "mean": 0.46119387395575207,
+        "std": 0.038876018520898184
+      },
+      "roc_auc": {
+        "mean": 0.9409604303839382,
+        "std": 0.011159618551851238
+      },
+      "best_f1": {
+        "mean": 0.6205348902751149,
+        "std": 0.021541198918737545
+      },
+      "recall_at_precision_50": {
+        "mean": 0.5706731804210083,
+        "std": 0.3505385249211075
+      }
+    },
+    "logistic_regression": {
+      "pr_auc": {
+        "mean": 0.7997471494048247,
+        "std": 0.026266995215708612
+      },
+      "roc_auc": {
+        "mean": 0.9707866611201231,
+        "std": 0.004804487423526945
+      },
+      "best_f1": {
+        "mean": 0.7660012804294561,
+        "std": 0.022738954699614542
+      },
+      "recall_at_precision_50": {
+        "mean": 0.9118588681755565,
+        "std": 0.03087605532719415
+      }
+    },
+    "random_forest": {
+      "pr_auc": {
+        "mean": 0.7859192220405039,
+        "std": 0.018330497875439312
+      },
+      "roc_auc": {
+        "mean": 0.9705424195188643,
+        "std": 0.011601663652915518
+      },
+      "best_f1": {
+        "mean": 0.7629169386324222,
+        "std": 0.019491014860020667
+      },
+      "recall_at_precision_50": {
+        "mean": 0.9054282438601824,
+        "std": 0.028098804329575067
+      }
+    },
+    "xgboost": {
+      "pr_auc": {
+        "mean": 0.7821396690176474,
+        "std": 0.02463174788581799
+      },
+      "roc_auc": {
+        "mean": 0.9674172834817363,
+        "std": 0.01139280517704872
+      },
+      "best_f1": {
+        "mean": 0.766710446489851,
+        "std": 0.020713933001519514
+      },
+      "recall_at_precision_50": {
+        "mean": 0.898266018821996,
+        "std": 0.02187783892092424
+      }
+    }
+  },
+  "production_algorithm": "logistic_regression",
+  "holdout": {
+    "cutoff": "2026-06-26T06:00:00+00:00",
+    "train_rows": 41529,
+    "test_rows": 14164,
+    "test_positives": 889,
+    "models": {
+      "rule_baseline": {
+        "pr_auc": 0.5096647879741234,
+        "roc_auc": 0.9483392542033942,
+        "best_f1": 0.6339468302658486,
+        "recall_at_precision_50": 0.8627671541057368
+      },
+      "logistic_regression": {
+        "pr_auc": 0.8287628869424448,
+        "roc_auc": 0.9802323862059615,
+        "best_f1": 0.7812142038946162,
+        "recall_at_precision_50": 0.9493813273340832
+      },
+      "random_forest": {
+        "pr_auc": 0.8383364820566913,
+        "roc_auc": 0.986212528518681,
+        "best_f1": 0.7798066595059076,
+        "recall_at_precision_50": 0.9786276715410573
+      },
+      "xgboost": {
+        "pr_auc": 0.80909352351921,
+        "roc_auc": 0.9832920461213533,
+        "best_f1": 0.7679671457905545,
+        "recall_at_precision_50": 0.9561304836895388
+      }
+    },
+    "production_calibrated": {
+      "algorithm": "logistic_regression",
+      "pr_auc": 0.7952379806876617,
+      "roc_auc": 0.9732646554773874,
+      "best_f1": 0.7685393258426966,
+      "recall_at_precision_50": 0.8245219347581553,
+      "brier": 0.02584022044182412,
+      "brier_base_rate": 0.0591528488661219,
+      "reliability": [
+        {
+          "bin_low": 0.0,
+          "bin_high": 0.1,
+          "count": 13122,
+          "mean_predicted": 0.002652720361979706,
+          "observed_rate": 0.01188843164151806
+        },
+        {
+          "bin_low": 0.1,
+          "bin_high": 0.2,
+          "count": 78,
+          "mean_predicted": 0.17491166034330538,
+          "observed_rate": 0.3333333333333333
+        },
+        {
+          "bin_low": 0.2,
+          "bin_high": 0.30000000000000004,
+          "count": 220,
+          "mean_predicted": 0.2230935801886741,
+          "observed_rate": 0.41363636363636364
+        },
+        {
+          "bin_low": 0.30000000000000004,
+          "bin_high": 0.4,
+          "count": 270,
+          "mean_predicted": 0.3758681112297717,
+          "observed_rate": 0.6555555555555556
+        },
+        {
+          "bin_low": 0.5,
+          "bin_high": 0.6000000000000001,
+          "count": 112,
+          "mean_predicted": 0.5555555555555555,
+          "observed_rate": 0.875
+        },
+        {
+          "bin_low": 0.6000000000000001,
+          "bin_high": 0.7000000000000001,
+          "count": 62,
+          "mean_predicted": 0.6759240750344744,
+          "observed_rate": 0.9516129032258065
+        },
+        {
+          "bin_low": 0.7000000000000001,
+          "bin_high": 0.8,
+          "count": 80,
+          "mean_predicted": 0.746973912136354,
+          "observed_rate": 0.975
+        },
+        {
+          "bin_low": 0.8,
+          "bin_high": 0.9,
+          "count": 4,
+          "mean_predicted": 0.8166375886517738,
+          "observed_rate": 1.0
+        },
+        {
+          "bin_low": 0.9,
+          "bin_high": 1.0,
+          "count": 216,
+          "mean_predicted": 0.9411945592771258,
+          "observed_rate": 0.9259259259259259
+        }
+      ],
+      "thresholds": [
+        {
+          "risk_level": "medium",
+          "threshold": 0.1,
+          "precision": 0.7034548944337812,
+          "recall": 0.8245219347581553,
+          "flagged_share": 0.07356678904264333
+        },
+        {
+          "risk_level": "high",
+          "threshold": 0.3,
+          "precision": 0.8279569892473119,
+          "recall": 0.6929133858267716,
+          "flagged_share": 0.052527534594747245
+        },
+        {
+          "risk_level": "critical",
+          "threshold": 0.6,
+          "precision": 0.9419889502762431,
+          "recall": 0.38357705286839144,
+          "flagged_share": 0.025557752047444225
+        }
+      ],
+      "lead_time_at_high": {
+        "failures": 35,
+        "detected": 34,
+        "detection_rate": 0.9714285714285714,
+        "median_lead_days": 6.583333333333333
+      }
+    },
+    "global_importance": [
+      {
+        "feature": "bearing_temp_rise__slope_72h",
+        "mean_abs_shap": 1.4291175352480951
+      },
+      {
+        "feature": "bearing_temp_rise__z_72h",
+        "mean_abs_shap": 1.4273647355944286
+      },
+      {
+        "feature": "motor_current__slope_72h",
+        "mean_abs_shap": 1.2912001555122599
+      },
+      {
+        "feature": "motor_current__z_24h",
+        "mean_abs_shap": 1.2044828752659074
+      },
+      {
+        "feature": "motor_current__z_72h",
+        "mean_abs_shap": 1.1271712301057775
+      },
+      {
+        "feature": "bearing_temp_rise__z_24h",
+        "mean_abs_shap": 0.9706199505467276
+      },
+      {
+        "feature": "discharge_pressure__z_24h",
+        "mean_abs_shap": 0.9620925496525519
+      },
+      {
+        "feature": "motor_current__slope_24h",
+        "mean_abs_shap": 0.8531699795758346
+      },
+      {
+        "feature": "type_compressor",
+        "mean_abs_shap": 0.8482739664568477
+      },
+      {
+        "feature": "type_pump",
+        "mean_abs_shap": 0.8367957636671373
+      },
+      {
+        "feature": "bearing_temp_rise__mean_24h",
+        "mean_abs_shap": 0.6236899597640099
+      },
+      {
+        "feature": "vibration_rms__mean_24h",
+        "mean_abs_shap": 0.5592704631920901
+      },
+      {
+        "feature": "discharge_pressure__mean_24h",
+        "mean_abs_shap": 0.5585671300489619
+      },
+      {
+        "feature": "vibration_rms__max_24h",
+        "mean_abs_shap": 0.5277036038761456
+      },
+      {
+        "feature": "winding_temp_rise__z_24h",
+        "mean_abs_shap": 0.48970116451422674
+      }
+    ]
+  },
+  "rul": {
+    "test_rows": 5577,
+    "mae_days": 10.777483448265732,
+    "rmse_days": 13.558571343994378,
+    "mae_days_last_14d": 10.574500416915033,
+    "baseline_median_mae_days": 14.829018737672584
+  },
+  "anomaly": {
+    "roc_auc_vs_failure_within_horizon": 0.9451105052546398
+  },
+  "elapsed_seconds": 192.9,
+  "library_versions": {
+    "xgboost": "3.4.1",
+    "scikit-learn": "1.9.1"
+  },
+  "fleet_config": {
+    "n_units": 40,
+    "days": 365,
+    "seed": 42,
+    "freq_minutes": 30,
+    "end": "2026-10-01T00:00:00+00:00"
+  }
+}
