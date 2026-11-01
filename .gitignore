@@ -8,3 +8,9 @@ dist/
 .mypy_cache/
 ml/artifacts/
 data/generated/
+var/
+*.egg-info/
+.coverage
+.ruff_cache/
+coverage/
+frontend/dist/
