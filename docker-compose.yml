@@ -1,0 +1,61 @@
+# Local development / demo stack.
+#   cp .env.example .env   (then edit the secrets)
+#   docker compose up -d --build
+#   docker compose run --rm api python -m app.cli demo --admin-email admin@example.com
+# Open http://localhost:8080
+name: predictive-maintenance
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pdm
+      POSTGRES_USER: pdm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pdm -d pdm"]
+      interval: 5s
+      retries: 10
+    ports: ["127.0.0.1:5433:5432"]  # localhost only; 5433 avoids clashing with a local PostgreSQL
+
+  migrate:
+    build: ./backend
+    command: ["python", "-m", "app.cli", "migrate"]
+    healthcheck: { disable: true }
+    env_file: .env
+    environment: &backend_env
+      PDM_DATABASE_URL: postgresql+psycopg://pdm:${POSTGRES_PASSWORD}@db:5432/pdm
+    depends_on:
+      db: { condition: service_healthy }
+
+  api:
+    build: ./backend
+    env_file: .env
+    environment: *backend_env
+    volumes: [artifacts:/app/var]
+    restart: unless-stopped
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    ports: ["127.0.0.1:8000:8000"]
+
+  worker:
+    build: ./backend
+    command: ["python", "-m", "app.cli", "worker"]
+    healthcheck: { disable: true }  # no HTTP server; liveness = process running (restart policy)
+    restart: unless-stopped
+    env_file: .env
+    environment: *backend_env
+    volumes: [artifacts:/app/var]  # shares model artifacts and uploads with the API
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    stop_grace_period: 60s
+
+  web:
+    build: ./frontend
+    depends_on: [api]
+    ports: ["127.0.0.1:8080:8080"]
+
+volumes:
+  pgdata:
+  artifacts:

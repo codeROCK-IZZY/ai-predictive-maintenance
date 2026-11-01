@@ -1,0 +1,7 @@
+{
+  "name": "pdm-e2e",
+  "private": true,
+  "description": "Browser smoke test for a running stack",
+  "scripts": { "smoke": "node smoke.cjs" },
+  "devDependencies": { "playwright": "1.49.1" }
+}
