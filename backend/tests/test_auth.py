@@ -109,8 +109,11 @@ def test_refresh_rotation_and_reuse_detection(client):
     new = client.cookies.get("pdm_refresh")
     assert new and new != old
     # Replaying the old (rotated) token is treated as theft: everything is revoked.
+    # Clear the jar first so the test client sends exactly one cookie (it can otherwise keep both).
+    client.cookies.clear()
     client.cookies.set("pdm_refresh", old, path="/api/v1/auth")
     assert client.post("/api/v1/auth/refresh").status_code == 401
+    client.cookies.clear()
     client.cookies.set("pdm_refresh", new, path="/api/v1/auth")
     assert client.post("/api/v1/auth/refresh").status_code == 401
 
@@ -120,6 +123,7 @@ def test_logout_revokes_refresh_token(client):
     client.post(LOGIN, json={"email": "a@example.com", "password": PASSWORD})
     token = client.cookies.get("pdm_refresh")
     assert client.post("/api/v1/auth/logout").status_code == 204
+    client.cookies.clear()
     client.cookies.set("pdm_refresh", token, path="/api/v1/auth")
     assert client.post("/api/v1/auth/refresh").status_code == 401
 
