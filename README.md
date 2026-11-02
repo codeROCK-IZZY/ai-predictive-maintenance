@@ -2,6 +2,22 @@
 
 Predicts industrial equipment failures from sensor data, explains every prediction, and recommends maintenance before a breakdown happens.
 
+## The problem
+
+Unplanned equipment failure is one of the most expensive events in manufacturing, energy and utilities:
+production stops, emergency repairs cost far more than planned work, and some failures are dangerous. Most
+sites either repair machines after they break, or service them on a fixed calendar, which replaces healthy
+parts and still misses failures that develop between visits.
+
+## What this platform does
+
+- Collects sensor readings (vibration, temperature, current, pressure, flow) from pumps, compressors and motors through an API or CSV upload.
+- Estimates each machine's probability of failing in the next 7 days, a 0–100 health score and its remaining useful life.
+- Explains **why** in plain language ("vibration has been rising steadily for three days"), so engineers can trust the prediction and act on it.
+- Raises alerts when risk climbs and recommends a maintenance action, so work is scheduled **before** the breakdown instead of after it.
+
+**Who it is for:** maintenance engineers and reliability teams deciding which machine to service first.
+
 **Stack:** Python 3.13 · FastAPI · PostgreSQL 16 · scikit-learn · XGBoost · SHAP · React 18 + TypeScript · Tailwind · Docker · Terraform (AWS ECS Fargate + RDS) · GitHub Actions
 
 ![Fleet dashboard](docs/screenshots/dashboard.png)
