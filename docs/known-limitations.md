@@ -14,7 +14,7 @@ Everything listed here is a deliberate scope decision or a measured weakness, no
 
 ## Platform
 - **Login rate limiter is per process.** With several API replicas, each enforces its own limit. Production answer: a shared store (Redis) or an AWS WAF rate-based rule.
-- **Ingestion is batch, not streaming.** There is no MQTT / OPC-UA / Kafka connector. The REST batch endpoint is the integration point; Project 3 (fraud detection) covers streaming with Kafka.
+- **Ingestion is batch, not streaming.** There is no MQTT / OPC-UA / Kafka connector. The REST batch endpoint is the integration point; the Fraud Detection Engine (a separate repository) shows streaming with Kafka.
 - **Scoring is on-demand or event-driven.** Units are re-scored after new data is ingested, on activation of a model, or by `score-all`. There is no built-in periodic scheduler. In production, use an EventBridge schedule (or cron) that runs `python -m app.cli score-all`.
 - **Single-tenant.** There is no organisation separation, and all users see all equipment.
 - **No e-mail or SMS notifications for alerts.** Alerts appear in the UI only. On AWS, CloudWatch alarms notify operators about *platform* health, not equipment risk.
@@ -24,4 +24,4 @@ Everything listed here is a deliberate scope decision or a measured weakness, no
 - **S3 code paths:** the CSV upload hand-off is tested against a fake S3 client; `S3ArtifactStore` (model artifacts in S3) is **not covered by automated tests**. Neither has been run against real AWS.
 - **Terraform has not been applied to a real AWS account, and was not validated locally** (the Terraform CLI was not available in the development environment). CI runs `terraform fmt -check` and `terraform validate` on every push. Review the plan output carefully before the first `apply`.
 - **No concurrent load test yet.** A single-client check (`e2e/perf_check.py`, Docker on a 4-vCPU machine) measured 13,384 readings/s REST ingestion and prediction p50 128 ms / p95 242 ms (n = 40), which meets the design targets. Behaviour under many concurrent clients is unmeasured; a Locust or k6 test is the next step before production.
-- **No license file yet.** The repository owner should choose one (e.g. MIT) before publishing.
+- **No license file yet.** A license will be added.

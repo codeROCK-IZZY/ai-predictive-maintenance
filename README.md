@@ -128,4 +128,3 @@ docs/               design, development, operations, AWS deployment, model card,
 - [AWS deployment](docs/AWS_DEPLOYMENT.md): architecture, **cost estimate**, deploy, rollback, **teardown**
 - [Known limitations](docs/known-limitations.md)
 - [Learning guide](docs/LEARNING_GUIDE.md): a walkthrough of the code with exercises
-- [Portfolio roadmap](docs/PORTFOLIO_ROADMAP.md)

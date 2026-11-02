@@ -1,6 +1,6 @@
 # AI Predictive Maintenance Platform — Design Document (v1.0)
 
-Status: **Approved by the owner on 2026-11-01 and implemented.** Section 9 lists where the implementation deviates from this design, and why.
+Status: **Implemented.** Section 9 lists where the implementation deviates from this design, and why.
 
 Contents
 1. Product requirements
@@ -10,7 +10,7 @@ Contents
 5. Machine-learning strategy
 6. Security design
 7. Implementation roadmap
-8. Decisions that need your approval
+8. Key design decisions
 
 ---
 
@@ -69,7 +69,7 @@ Real-time streaming from PLC/OPC-UA/MQTT (designed for, not built in MVP), multi
 | Option | Pros | Cons |
 |---|---|---|
 | **Modular monolith + worker (recommended)** | Simple to run, debug and understand; one DB transaction boundary; easy to split later because module boundaries are enforced | Must stay disciplined about module boundaries |
-| Microservices (ingestion / ML / alerts) | Independent scaling, looks "enterprise" | Network calls, distributed failure modes, much more infra — complexity without a real scaling need at this size. Project 9 is where distributed systems are showcased |
+| Microservices (ingestion / ML / alerts) | Independent scaling, looks "enterprise" | Network calls, distributed failure modes, much more infra — complexity without a real scaling need at this size. distributed systems belong in a dedicated inference platform |
 
 ### 2.2 Decision: job queue in PostgreSQL (not Redis/Celery) for MVP
 Jobs are rows in a `jobs` table, claimed with `SELECT … FOR UPDATE SKIP LOCKED`. One less service to run, jobs are transactional with the data they touch, and status is queryable for the UI. Throughput (hundreds of jobs/minute) is far above what this app needs. If it is outgrown, swap the queue adapter for SQS on AWS.
@@ -313,7 +313,7 @@ Caveat to be stated in README: high scores on synthetic data mostly measure how 
 SHAP TreeExplainer for XGBoost/RF (exact, milliseconds per row). Top 3–5 contributions stored in `predictions.explanation`; a template maps feature names to human sentences. Global feature importance shown on the model page.
 
 ### 5.9 Model registry & lifecycle
-Training job → artifacts (`model.joblib`, `calibrator.joblib`, `features.json`, `metrics.json`) saved to the artifact store → row in `model_versions` → admin reviews metrics → activates. The API loads the active model at startup and on activation. MLflow is intentionally deferred to Project 8 (AWS MLOps) to avoid duplicating that showcase; the registry interface is designed so MLflow can replace it.
+Training job → artifacts (`model.joblib`, `calibrator.joblib`, `features.json`, `metrics.json`) saved to the artifact store → row in `model_versions` → admin reviews metrics → activates. The API loads the active model at startup and on activation. MLflow is intentionally deferred to a dedicated AWS MLOps project (AWS MLOps) to avoid duplicating that showcase; the registry interface is designed so MLflow can replace it.
 
 ---
 
@@ -332,7 +332,7 @@ Training job → artifacts (`model.joblib`, `calibrator.joblib`, `features.json`
 
 ## 7. Implementation roadmap
 
-Each milestone ends with: passing tests (output shown), docs updated, a walkthrough for you, and your sign-off.
+Each milestone ends with passing tests and updated documentation.
 
 | # | Milestone | Deliverables |
 |---|---|---|
@@ -351,13 +351,13 @@ Each milestone ends with: passing tests (output shown), docs updated, a walkthro
 
 ---
 
-## 8. Decisions that need your approval
+## 8. Key design decisions
 1. **Modular monolith + worker** instead of microservices (§2.1).
 2. **PostgreSQL job queue** instead of Redis/Celery for MVP (§2.2).
 3. **Plain PostgreSQL with monthly partitions** instead of TimescaleDB (§3.3).
 4. **Prediction target:** failure within **7 days** (H configurable).
 5. **Synthetic fleet** of pumps / compressors / motors (§5.1), optionally plus NASA C-MAPSS as an external check.
-6. **MLflow deferred to Project 8**; lightweight in-app model registry here (§5.9).
+6. **MLflow deferred to a dedicated AWS MLOps project**; lightweight in-app model registry here (§5.9).
 7. **Frontend stack:** Vite + React + TypeScript + TanStack Query + Recharts + Tailwind (vs. Next.js — not needed for an authenticated internal dashboard).
 
 ---
@@ -374,4 +374,4 @@ Each milestone ends with: passing tests (output shown), docs updated, a walkthro
 | Upload hand-off | Local file | Local volume in Compose; **S3** on AWS | On ECS the API and worker are separate tasks with separate disks |
 | XGBoost package | `xgboost` | `xgboost-cpu` | Same API; the image shrank from 1.65 GB to 863 MB |
 | Repository layer | `repository.py` per module | Services query SQLAlchemy directly; trivial modules have only a router | Extra layer added no value at this size |
-| Advanced features | M11 roadmap | RUL, anomaly score, comparison, CSV reports, cost outlook and what-if simulator all built | Owner asked for everything |
+| Advanced features | M11 roadmap | RUL, anomaly score, comparison, CSV reports, cost outlook and what-if simulator all built | In scope for this release |
